@@ -1,0 +1,119 @@
+from tkinter import *
+import tkinter.font
+import time
+from gpiozero import LED
+import RPi.GPIO as GPIO
+
+#dictionary
+CODE = {' ': ' ',
+        "'": '.----.',
+        '(': '-.--.-',
+        ')': '-.--.-',
+        ',': '--..--',
+        '-': '-....-',
+        '.': '.-.-.-',
+        '/': '-..-.',
+        '0': '-----',
+        '1': '.----',
+        '2': '..---',
+        '3': '...--',
+        '4': '....-',
+        '5': '.....',
+        '6': '-....',
+        '7': '--...',
+        '8': '---..',
+        '9': '----.',
+        ':': '---...',
+        ';': '-.-.-.',
+        '?': '..--..',
+        'A': '.-',
+        'B': '-...',
+        'C': '-.-.',
+        'D': '-..',
+        'E': '.',
+        'F': '..-.',
+        'G': '--.',
+        'H': '....',
+        'I': '..',
+        'J': '.---',
+        'K': '-.-',
+        'L': '.-..',
+        'M': '--',
+        'N': '-.',
+        'O': '---',
+        'P': '.--.',
+        'Q': '--.-',
+        'R': '.-.',
+        'S': '...',
+        'T': '-',
+        'U': '..-',
+        'V': '...-',
+        'W': '.--',
+        'X': '-..-',
+        'Y': '-.--',
+        'Z': '--..',
+        '_': '..--.-'}
+
+#declare pin number standard
+GPIO.setmode(GPIO.BCM)
+
+#LED def
+led = 21
+GPIO.setup(led,GPIO.OUT)
+
+#GUI def
+win = Tk()
+v = tkinter.IntVar()
+
+win.title("Blink LED in Morse Code")
+myFont = tkinter.font.Font(family = 'Helvetica', size = 12, weight = "bold")
+
+tkinter.Label(win, text="""Write a word to blink""", justify = tkinter.CENTER, padx = 20).pack()
+
+#Event func
+def dot():
+	GPIO.output(led,GPIO.HIGH)
+	time.sleep(0.2)
+	GPIO.output(led,GPIO.LOW)
+	time.sleep(0.2)
+
+def dash():
+	GPIO.output(led,GPIO.HIGH)
+	time.sleep(0.5)
+	GPIO.output(led,GPIO.LOW)
+	time.sleep(0.2)
+	
+def close():
+    GPIO.cleanup()
+    win.destroy()
+    
+def blink():
+    my_input = my_text.get()
+        
+    if len(my_input) <= 12:
+        for letter in my_input:
+	        for symbol in CODE[letter.upper()]:
+		        if symbol == '-':
+			        dash()
+		        elif symbol == '.':
+			        dot()
+		        else:
+			        time.sleep(0.5)
+	        time.sleep(0.5)
+    else:
+        LABEL = tkinter.Label(win, text="""Text '"""+my_input+""" has more than 12 charachters""", justify = tkinter.LEFT, padx = 20).pack()
+        
+def clear():
+    my_text.delete(0, END)
+    
+#widgets
+my_text = Entry(win, bd = 1, font = myFont, width = 27)
+my_text.pack(anchor = tkinter.W)
+
+getbutton = Button(win, text = 'Blink LED', font = myFont, command = blink, bg = 'yellow', height = 1, width = 25).pack(anchor = tkinter.W)
+clearbutton = Button(win, text = 'Clear', font = myFont, command = clear, bg = 'white', height = 1, width = 25).pack(anchor = tkinter.W)
+exitbutton = Button(win, text = 'Exit', font = myFont, command = close, bg = 'red', height = 1, width = 25).pack(anchor = tkinter.W)
+
+win.protocol("WM_DELETE_WINDOW", close)
+
+win.mainloop()
